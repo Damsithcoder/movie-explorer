@@ -9,6 +9,10 @@ import './App.css'
 function App() {
   const [movies, setMovies] = useState([])
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [currentFilters, setCurrentFilters] = useState({})
+  const [loading, setLoading] = useState(false)
 
   const API_KEY = import.meta.env.VITE_TMDB_API_KEY
   const BASE_URL = 'https://api.themoviedb.org/3'
@@ -17,72 +21,91 @@ function App() {
     fetchMovies()
   }, [])
 
-  const fetchMovies = async (filters = {}) => {
+  const fetchMovies = async (filters = {}, page = 1, append = false) => {
     try {
-      let endpoint = `${BASE_URL}/movie/now_playing`;
+      setLoading(true)
+      let endpoint = `${BASE_URL}/movie/now_playing`
       let params = {
         api_key: API_KEY,
         language: filters.language || 'en-US',
-        page: 1,
-      };
+        page: page,
+      }
 
       // If there's a search query, use the search endpoint
       if (filters.query) {
-        endpoint = `${BASE_URL}/search/movie`;
+        endpoint = `${BASE_URL}/search/movie`
         params = {
           ...params,
           query: filters.query,
-        };
+        }
       }
 
       // Add region filter if country is selected
       if (filters.country) {
-        params.region = filters.country;
+        params.region = filters.country
       }
 
-      const response = await axios.get(endpoint, { params });
-      let movies = response.data.results;
+      // Add genre filter if selected
+      if (filters.genre) {
+        params.with_genres = filters.genre
+      }
+
+      const response = await axios.get(endpoint, { params })
+      let newMovies = response.data.results
+      setTotalPages(response.data.total_pages)
 
       // Filter by duration if specified
       if (filters.duration) {
         // Fetch detailed info for each movie to get runtime
         const movieDetails = await Promise.all(
-          movies.slice(0, 10).map(async (movie) => {
+          newMovies.slice(0, 10).map(async (movie) => {
             try {
               const detailResponse = await axios.get(`${BASE_URL}/movie/${movie.id}`, {
                 params: { api_key: API_KEY }
-              });
-              return { ...movie, runtime: detailResponse.data.runtime };
+              })
+              return { ...movie, runtime: detailResponse.data.runtime }
             } catch (error) {
-              console.error(`Error fetching details for movie ${movie.id}:`, error);
-              return { ...movie, runtime: 0 };
+              console.error(`Error fetching details for movie ${movie.id}:`, error)
+              return { ...movie, runtime: 0 }
             }
           })
-        );
+        )
 
-        movies = movieDetails.filter(movie => {
+        newMovies = movieDetails.filter(movie => {
           switch (filters.duration) {
             case 'short':
-              return movie.runtime < 90;
+              return movie.runtime < 90
             case 'medium':
-              return movie.runtime >= 90 && movie.runtime <= 120;
+              return movie.runtime >= 90 && movie.runtime <= 120
             case 'long':
-              return movie.runtime > 120;
+              return movie.runtime > 120
             default:
-              return true;
+              return true
           }
-        });
+        })
       }
 
-      setMovies(movies);
+      setMovies(append ? [...movies, ...newMovies] : newMovies)
+      setCurrentPage(page)
+      setCurrentFilters(filters)
     } catch (error) {
-      console.error('Error fetching movies:', error);
+      console.error('Error fetching movies:', error)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   const handleSearch = (filters) => {
-    fetchMovies(filters);
-  };
+    setMovies([])
+    setCurrentPage(1)
+    fetchMovies(filters, 1)
+  }
+
+  const handleLoadMore = () => {
+    if (currentPage < totalPages && !loading) {
+      fetchMovies(currentFilters, currentPage + 1, true)
+    }
+  }
 
   return (
     <div className="app">
@@ -107,6 +130,18 @@ function App() {
             </Grid>
           ))}
         </Grid>
+
+        {movies.length > 0 && currentPage < totalPages && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}>
+            <Button
+              variant="contained"
+              onClick={handleLoadMore}
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Load More'}
+            </Button>
+          </Box>
+        )}
       </Container>
 
       <SignUpModal

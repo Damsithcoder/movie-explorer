@@ -3,12 +3,16 @@ import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material'
 import '../styles/MovieCard.css';
 
 const MovieCard = ({ movie }) => {
+  const imageUrl = movie.poster_path
+    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+    : 'https://via.placeholder.com/500x750?text=No+Image+Available';
+
   return (
     <Card className="movie-card">
       <CardMedia
         component="img"
         height="300"
-        image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+        image={imageUrl}
         alt={movie.title}
         className="movie-image"
       />
@@ -19,16 +23,20 @@ const MovieCard = ({ movie }) => {
         <Typography variant="body2" color="text.secondary">
           Release Date: {movie.release_date}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Duration: {movie.runtime} min
-        </Typography>
+        {movie.runtime && (
+          <Typography variant="body2" color="text.secondary">
+            Duration: {movie.runtime} min
+          </Typography>
+        )}
         <Button
           variant="contained"
           color="primary"
           className="watch-button"
-          href={`/movie/${movie.id}`}
+          href={`https://www.themoviedb.org/movie/${movie.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          Watch Movie
+          More Info
         </Button>
       </CardContent>
     </Card>

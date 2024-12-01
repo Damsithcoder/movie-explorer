@@ -1,0 +1,31 @@
+.search-container {
+  padding: 24px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.search-input {
+  margin-bottom: 16px;
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter {
+  min-width: 200px;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+  
+  .filter {
+    width: 100%;
+  }
+}

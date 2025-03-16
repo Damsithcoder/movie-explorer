@@ -47,6 +47,7 @@ function App() {
 
       // Add genre filter if selected
       if (filters.genre) {
+        endpoint = `${BASE_URL}/discover/movie?`
         params.with_genres = filters.genre
       }
 

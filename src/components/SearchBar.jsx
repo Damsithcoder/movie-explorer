@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Select, MenuItem, FormControl, InputLabel, Box } from '@mui/material';
+import { TextField, Select, MenuItem, FormControl, InputLabel, Box} from '@mui/material';
 import axios from 'axios';
 import '../styles/SearchBar.css';
 
@@ -40,6 +40,14 @@ const SearchBar = ({ onSearch }) => {
     }));
     onSearch({ ...filters, [name]: value });
   };
+  function close(){
+    setFilters(prev => ({
+      ...prev,
+      query: ''
+    }))
+    // query=""
+    
+  }
 
   return (
     <Box className="search-container">
@@ -52,6 +60,7 @@ const SearchBar = ({ onSearch }) => {
         onChange={handleChange}
         className="search-input"
       />
+      <button className="close" onClick={close}>*</button>
       <Box className="filters">
         <FormControl className="filter">
           <InputLabel>Language</InputLabel>

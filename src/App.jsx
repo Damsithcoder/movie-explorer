@@ -24,20 +24,20 @@ function App() {
   const fetchMovies = async (filters = {}, page = 1, append = false) => {
     try {
       setLoading(true)
-      let endpoint = `${BASE_URL}/movie/now_playing`
+      let endpoint = filters.query 
+        ? `${BASE_URL}/search/movie`
+        : `${BASE_URL}/discover/movie`  
+
       let params = {
         api_key: API_KEY,
         language: filters.language || 'en-US',
         page: page,
+        sort_by: 'popularity.desc'  
       }
 
-      // If there's a search query, use the search endpoint
+      // Add search query if present
       if (filters.query) {
-        endpoint = `${BASE_URL}/search/movie`
-        params = {
-          ...params,
-          query: filters.query,
-        }
+        params.query = filters.query
       }
 
       // Add region filter if country is selected
@@ -54,38 +54,40 @@ function App() {
       let newMovies = response.data.results
       setTotalPages(response.data.total_pages)
 
-      // Filter by duration if specified
-      if (filters.duration) {
-        // Fetch detailed info for each movie to get runtime
-        const movieDetails = await Promise.all(
-          newMovies.slice(0, 10).map(async (movie) => {
-            try {
-              const detailResponse = await axios.get(`${BASE_URL}/movie/${movie.id}`, {
-                params: { api_key: API_KEY }
-              })
-              return { ...movie, runtime: detailResponse.data.runtime }
-            } catch (error) {
-              console.error(`Error fetching details for movie ${movie.id}:`, error)
-              return { ...movie, runtime: 0 }
-            }
-          })
-        )
+      // Fetch additional details for each movie
+      const movieDetails = await Promise.all(
+        newMovies.map(async (movie) => {
+          try {
+            const detailResponse = await axios.get(`${BASE_URL}/movie/${movie.id}`, {
+              params: { api_key: API_KEY }
+            })
+            return { ...movie, ...detailResponse.data }
+          } catch (error) {
+            console.error(`Error fetching details for movie ${movie.id}:`, error)
+            return movie
+          }
+        })
+      )
 
-        newMovies = movieDetails.filter(movie => {
+      // Filter by duration if specified
+      let filteredMovies = movieDetails
+      if (filters.duration) {
+        filteredMovies = movieDetails.filter(movie => {
+          const runtime = movie.runtime || 0
           switch (filters.duration) {
             case 'short':
-              return movie.runtime < 90
+              return runtime > 0 && runtime < 90
             case 'medium':
-              return movie.runtime >= 90 && movie.runtime <= 120
+              return runtime >= 90 && runtime <= 120
             case 'long':
-              return movie.runtime > 120
+              return runtime > 120
             default:
               return true
           }
         })
       }
 
-      setMovies(append ? [...movies, ...newMovies] : newMovies)
+      setMovies(append ? [...movies, ...filteredMovies] : filteredMovies)
       setCurrentPage(page)
       setCurrentFilters(filters)
     } catch (error) {

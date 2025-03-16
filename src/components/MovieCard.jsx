@@ -23,11 +23,12 @@ const MovieCard = ({ movie }) => {
         <Typography variant="body2" color="text.secondary">
           Release Date: {movie.release_date}
         </Typography>
-        {movie.runtime && (
+        {movie.runtime > 0 && (
           <Typography variant="body2" color="text.secondary">
             Duration: {movie.runtime} min
           </Typography>
         )}
+        
         <Button
           variant="contained"
           color="primary"

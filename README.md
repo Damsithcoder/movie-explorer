@@ -8,7 +8,7 @@ A React-based application built with Vite that allows users to explore and disco
 
 ## Screenshot
 
-![Movie Explorer Screenshot](src/assets/Screenshot (6).png)
+![Movie Explorer Screenshot](movie-explorer/src/assets/Screenshot (6).png)
 
 ## Features
 

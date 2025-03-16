@@ -2,17 +2,34 @@
   padding: 24px;
   background-color: #f5f5f5;
   border-radius: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
+  position: relative;
 }
 
 .search-input {
   margin-bottom: 16px;
 }
 
+.close{
+  left: 93%;
+  top: 10%;
+  width: 45px;
+  height: 45px;
+  margin-top: 10px;
+  border-radius: 50%;
+  background-color: transparent;
+  position: absolute;
+  text-align: center;
+}
+.close:focus{
+  border:none ;
+
+}
 .filters {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  margin-top: 15px;
 }
 
 .filter {

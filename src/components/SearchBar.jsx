@@ -9,7 +9,8 @@ const SearchBar = ({ onSearch }) => {
     language: '',
     country: '',
     duration: '',
-    genre: ''
+    genre: '',
+    catagory : ''
   });
 
   const [genres, setGenres] = useState([]);
@@ -45,6 +46,7 @@ const SearchBar = ({ onSearch }) => {
       ...prev,
       query: ''
     }))
+    onSearch({filters});
     // query=""
     
   }
@@ -60,8 +62,9 @@ const SearchBar = ({ onSearch }) => {
         onChange={handleChange}
         className="search-input"
       />
-      <button className="close" onClick={close}>*</button>
+      <button className="close" onClick={close}> X </button>
       <Box className="filters">
+        
         <FormControl className="filter">
           <InputLabel>Language</InputLabel>
           <Select

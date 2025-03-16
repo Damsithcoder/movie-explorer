@@ -26,13 +26,13 @@ function App() {
       setLoading(true)
       let endpoint = filters.query 
         ? `${BASE_URL}/search/movie`
-        : `${BASE_URL}/discover/movie`  
+        : `${BASE_URL}/discover/movie` 
 
       let params = {
         api_key: API_KEY,
         language: filters.language || 'en-US',
         page: page,
-        sort_by: 'popularity.desc'  
+        sort_by: 'rating.desc'  
       }
 
       // Add search query if present
@@ -44,6 +44,7 @@ function App() {
       if (filters.country) {
         params.region = filters.country
       }
+      
 
       // Add genre filter if selected
       if (filters.genre) {

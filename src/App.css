@@ -17,18 +17,7 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
-.search-input{
-  position: relative;
-}
-.close{
-  left: 89%;
-  width: 45px;
-  height: 45px;
-  margin-top: 10px;
-  border-radius: 50%;
-  background-color: azure;
-  position: absolute;
-}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
